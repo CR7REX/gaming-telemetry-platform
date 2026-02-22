@@ -1,105 +1,136 @@
-# Gaming Telemetry Platform 🎮
+# League of Legends Analytics Platform 🎮⚔️
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![Apache Kafka](https://img.shields.io/badge/Kafka-3.6+-231F20.svg)](https://kafka.apache.org/)
 [![Apache Spark](https://img.shields.io/badge/Spark-3.5+-E25A1C.svg)](https://spark.apache.org/)
-[![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8.svg)](https://www.snowflake.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Real-time analytics platform for gaming telemetry, processing millions of player events daily.
+Real-time analytics platform for League of Legends, processing match data and player statistics to uncover meta trends and performance insights.
 
 ## 🎯 Overview
 
-This project demonstrates real-time stream processing and analytics for the gaming industry:
+This project demonstrates real-time stream processing and analytics for League of Legends:
 
-- **Event Streaming**: Apache Kafka for high-throughput data ingestion
-- **Stream Processing**: Apache Spark for real-time aggregations
-- **Data Warehouse**: Snowflake for analytics storage
-- **Metrics**: DAU, retention cohorts, monetization funnels
-- **Monitoring**: Real-time dashboards for game health
+- **Match Data Ingestion**: Riot Games API for comprehensive match history
+- **Real-time Streaming**: Apache Kafka for high-throughput event processing
+- **Stream Analytics**: Apache Spark for real-time win-rate calculations and meta analysis
+- **Data Warehouse**: PostgreSQL for structured analytics storage
+- **Visualization**: Interactive dashboards for champion performance, player stats, and meta trends
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────┐     ┌──────────────┐
-│  Game Client    │────▶│    Kafka    │────▶│ Spark        │
-│  (Events)       │     │   Cluster   │     │ Streaming    │
+│  Riot Games API │────▶│    Kafka    │────▶│ Spark        │
+│  (Match Data)   │     │   Cluster   │     │ Streaming    │
 └─────────────────┘     └─────────────┘     └──────────────┘
                                                      │
             ┌────────────────────────────────────────┘
             ▼
 ┌─────────────────┐     ┌─────────────┐     ┌──────────────┐
-│  Analytics DB   │◀────│  Snowflake  │◀────│   Spark      │
+│  Analytics DB   │◀────│  PostgreSQL │◀────│   Spark      │
 │  (Dashboards)   │     │  (Warehouse)│     │  (Batch)     │
 └─────────────────┘     └─────────────┘     └──────────────┘
 ```
 
 ## 🚀 Features
 
-- **Real-time Processing**: Sub-second latency for critical metrics
-- **Scalability**: Handles millions of events per minute
-- **Player Analytics**: Session tracking, progression analysis
-- **Monetization**: Purchase funnel, LTV prediction
-- **Retention**: Cohort analysis, churn prediction
+- **Champion Meta Analysis**: Track win rates, pick rates, and ban rates across patches
+- **Player Performance Metrics**: KDA, CS/min, vision score tracking
+- **Real-time Match Processing**: Live game event streaming and analysis
+- **Ranked Distribution**: Player base analysis by tier and division
+- **Item & Build Optimization**: Most effective item builds by champion and role
+- **Patch Impact Analysis**: How balance changes affect the meta
 
 ## 🛠️ Tech Stack
 
 | Component | Technology |
 |-----------|------------|
+| Data Source | Riot Games API |
 | Streaming | Apache Kafka |
 | Processing | Apache Spark (Streaming + Batch) |
-| Warehouse | Snowflake |
+| Database | PostgreSQL |
 | Orchestration | Apache Airflow |
-| Monitoring | Grafana, Prometheus |
-| Infrastructure | Kubernetes, Terraform |
+| Visualization | Streamlit |
+| Infrastructure | Docker, Docker Compose |
 
 ## 📁 Project Structure
 
 ```
 .
+├── api/                     # Riot API integration
+│   ├── client.py           # API client with rate limiting
+│   ├── match_fetcher.py    # Match history ingestion
+│   └── summoner_lookup.py  # Player profile retrieval
 ├── kafka/                   # Kafka producers and consumers
 │   ├── producers/
-│   ├── consumers/
-│   └── schemas/
+│   │   └── match_events.py
+│   └── consumers/
+│       └── match_processor.py
 ├── spark/                   # Spark streaming jobs
 │   ├── streaming/
+│   │   └── live_metrics.py
 │   └── batch/
+│       └── champion_stats.py
+├── dbt/                     # Data transformation models
+│   └── models/
+├── streamlit/               # Dashboard application
+│   └── app.py
 ├── airflow/                 # DAGs for orchestration
-├── snowflake/               # SQL scripts
-├── dashboards/              # Grafana configs
-└── docker-compose.yml       # Local stack
+│   └── dags/
+├── docker-compose.yml       # Local stack
+└── README.md
 ```
 
 ## 🚦 Quick Start
 
 ```bash
-# Start the full stack
+# Clone the repository
+git clone https://github.com/CR7REX/gaming-telemetry-platform.git
+cd gaming-telemetry-platform
+
+# Set up Riot API key
+export RIOT_API_KEY="your-api-key"
+
+# Start the infrastructure
 docker-compose up -d
 
-# Produce sample events
-python kafka/producers/generate_events.py
+# Fetch sample match data
+python api/match_fetcher.py --summoner-name="Faker" --region=kr
 
-# Run Spark streaming job
-spark-submit spark/streaming/player_metrics.py
+# Run Spark analysis
+spark-submit spark/batch/champion_stats.py
 
-# Access Grafana
-open http://localhost:3000
+# Launch dashboard
+streamlit run streamlit/app.py
 ```
 
 ## 📊 Key Metrics
 
-- **DAU/MAU**: Daily and monthly active users
-- **Session Duration**: Average playtime per session
-- **Retention**: Day 1, Day 7, Day 30 retention rates
-- **ARPU**: Average revenue per user
-- **Conversion**: Free-to-paid conversion funnel
+- **Champion Win Rate**: By patch, tier, and role
+- **Meta Shifts**: Pick/ban rate trends over time
+- **Player KDA**: Kill/Death/Assist ratios by champion
+- **Game Duration**: Average match length by patch
+- **First Blood Impact**: Correlation with win rate
+- **Objective Control**: Dragon/Baron control rates
+
+## 🔧 Riot API Integration
+
+This project uses the [Riot Games API](https://developer.riotgames.com/):
+
+- **Rate Limiting**: Automatic request throttling
+- **Caching**: Redis cache for frequently accessed data
+- **Error Handling**: Retry logic for failed requests
+- **Multi-region Support**: NA, EUW, KR, and more
 
 ## 🗺️ Roadmap
 
-- [ ] Implement ML-based churn prediction
-- [ ] Add A/B testing framework
-- [ ] Real-time anomaly detection
-- [ ] Multi-game support
+- [ ] Live match prediction using ML models
+- [ ] Champion recommendation engine
+- [ ] Player performance comparison tool
+- [ ] Esports match analysis (LCK, LPL, LEC, LCS)
+- [ ] Real-time draft phase analytics
 
 ## 📝 License
 
@@ -107,4 +138,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-*Leveling up data engineering, one game at a time* 🎮📈
+*Analyzing the Rift, one match at a time* ⚔️📊
